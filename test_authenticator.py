@@ -1,22 +1,32 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 
-st.title("✅ Streamlit Authenticator Fixed Example")
+st.title("✅ Streamlit Authenticator – Modern Format")
 
+# Read from secrets
 auth = st.secrets["auth"]
 
-names = list(auth["names"])
-usernames = list(auth["usernames"])
-passwords = list(auth["passwords"])
 cookie_name = str(auth["cookie_name"])
 signature_key = str(auth["signature_key"])
 cookie_expiry_days = int(auth["cookie_expiry_days"])
 
-# ✅ FIX: cookie_expiry_days passed positionally, not as keyword
+# 🔹 Build the credentials dict dynamically from your secrets
+credentials = {
+    "usernames": {
+        auth["usernames"][0]: {
+            "name": auth["names"][0],
+            "password": auth["passwords"][0]
+        },
+        auth["usernames"][1]: {
+            "name": auth["names"][1],
+            "password": auth["passwords"][1]
+        }
+    }
+}
+
+# ✅ Construct the authenticator (new API)
 authenticator = stauth.Authenticate(
-    names,
-    usernames,
-    passwords,
+    credentials,
     cookie_name,
     signature_key,
     cookie_expiry_days
