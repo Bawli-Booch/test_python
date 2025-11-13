@@ -1079,7 +1079,7 @@ else:
                         df_map["days_from_end"] = (pd.to_datetime(end_date) - df_map["last_date"]).dt.days
                         df_map["recency_cat"] = df_map["days_from_end"].apply(lambda x: "recent" if x <= 30 else "older")
                         fig = px.scatter_mapbox(df_map, lat="lat", lon="lon", hover_name="shelter_name_static", color="recency_cat",
-                                                color_discrete_map={"recent":"green","older":"orange"}, zoom=6, height=700)
+                                                color_discrete_map={"recent":"green","older":"orange"}, zoom=9, height=700)
                         fig.update_layout(mapbox_style="open-street-map")
                         st.plotly_chart(fig, use_container_width=True)
                     elif map_mode == "KPI Group mean":
@@ -1096,7 +1096,7 @@ else:
                                 df_map["kpi_mean"] = df_map[numeric].mean(axis=1)
                                 # color scale
                                 fig = px.scatter_mapbox(df_map, lat="lat", lon="lon", hover_name="shelter_name_static", color="kpi_mean",
-                                                        color_continuous_scale="RdYlGn", zoom=6, height=700)
+                                                        color_continuous_scale="RdYlGn", zoom=9, height=700)
                                 fig.update_layout(mapbox_style="open-street-map")
                                 st.plotly_chart(fig, use_container_width=True)
                             else:
@@ -1112,7 +1112,7 @@ else:
                             st.info("No numeric values for selected KPI.")
                         else:
                             fig = px.scatter_mapbox(df_map, lat="lat", lon="lon", hover_name="shelter_name_static", color=sel_kpi,
-                                                    color_continuous_scale="Viridis", zoom=6, height=700)
+                                                    color_continuous_scale="Viridis", zoom=9, height=700)
                             fig.update_layout(mapbox_style="open-street-map")
                             st.plotly_chart(fig, use_container_width=True)
     
