@@ -1,16 +1,16 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 
-st.title("✅ Streamlit Authenticator – Modern Format")
+st.title("✅ Streamlit Authenticator – Final Fixed (v0.4.1+)")
 
-# Read from secrets
+# --- Read from secrets ---
 auth = st.secrets["auth"]
 
 cookie_name = str(auth["cookie_name"])
 signature_key = str(auth["signature_key"])
 cookie_expiry_days = int(auth["cookie_expiry_days"])
 
-# 🔹 Build the credentials dict dynamically from your secrets
+# --- Build credentials dict dynamically ---
 credentials = {
     "usernames": {
         auth["usernames"][0]: {
@@ -24,7 +24,7 @@ credentials = {
     }
 }
 
-# ✅ Construct the authenticator (new API)
+# --- Initialize authenticator (new API) ---
 authenticator = stauth.Authenticate(
     credentials,
     cookie_name,
@@ -32,12 +32,14 @@ authenticator = stauth.Authenticate(
     cookie_expiry_days
 )
 
-name, auth_status, username = authenticator.login("Login", "main")
+# ✅ New login syntax (v0.4.1 and newer)
+name, auth_status, username = authenticator.login(fields={'Form name': 'Login'})
 
+# --- Handle login state ---
 if auth_status is False:
-    st.error("❌ Invalid username or password")
+    st.error("❌ Invalid username or password.")
 elif auth_status is None:
-    st.warning("Please enter your username and password.")
+    st.info("🟡 Please enter your credentials to access the dashboard.")
 else:
     authenticator.logout("Logout", "sidebar")
     st.sidebar.success(f"Welcome, {name}")
