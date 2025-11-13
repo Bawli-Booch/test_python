@@ -1,7 +1,6 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 
-st.title("✅ Streamlit Authenticator – Final Fixed (v0.4.1+)")
 
 # --- Read from secrets ---
 auth = st.secrets["auth"]
@@ -42,7 +41,7 @@ elif auth_status is None:
     st.info("🟡 Please enter your credentials to access the dashboard.")
 else:
     # --- Top right logout button ---
-    col1, col2 = st.columns([9, 1])
+    col1, col2 = st.columns([8, 2])
     with col2:
         authenticator.logout("🔓 Logout", "main")
     with col1:
