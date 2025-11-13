@@ -4,13 +4,15 @@ import pandas as pd
 import io
 from datetime import datetime
 
-# --- Load credentials securely from secrets.toml ---
+# -------------------------------------------------------
+# 🔒 AUTHENTICATION SETUP
+# -------------------------------------------------------
 auth_config = st.secrets["auth"]
 
 authenticator = stauth.Authenticate(
-    auth_config["credentials"]["names"],
-    auth_config["credentials"]["usernames"],
-    auth_config["credentials"]["passwords"],
+    auth_config["names"],
+    auth_config["usernames"],
+    auth_config["passwords"],
     auth_config["cookie_name"],
     auth_config["signature_key"],
     cookie_expiry_days=auth_config["cookie_expiry_days"]
@@ -18,19 +20,26 @@ authenticator = stauth.Authenticate(
 
 name, auth_status, username = authenticator.login("Login", "main")
 
-# --- Authentication flow ---
+# -------------------------------------------------------
+# 🚧 AUTHENTICATION STATES
+# -------------------------------------------------------
 if auth_status is False:
-    st.error("❌ Invalid username or password")
+    st.error("❌ Invalid username or password. Please try again.")
 elif auth_status is None:
-    st.warning("Please enter your username and password to continue.")
+    st.warning("👋 Please enter your username and password to access the dashboard.")
 else:
+    # -------------------------------------------------------
+    # ✅ MAIN DASHBOARD CONTENT
+    # -------------------------------------------------------
     authenticator.logout("Logout", "sidebar")
     st.sidebar.success(f"Welcome, {name}")
 
     st.title("📊 Goshala Inspection Dashboard")
-    st.write("✅ You are successfully logged in and can now view all dashboard data.")
+    st.write("You are now logged in and can view the complete dashboard.")
 
-    # Example dataset
+    # -------------------------------------------------------
+    # 🧾 SAMPLE DATA (replace with your actual Google Sheet)
+    # -------------------------------------------------------
     data = {
         "Date": pd.date_range(start="2025-01-01", periods=10, freq="D"),
         "Officer": ["Officer A", "Officer B"] * 5,
@@ -39,10 +48,19 @@ else:
     }
     df = pd.DataFrame(data)
 
-    # --- Date filter ---
+    # -------------------------------------------------------
+    # 📅 DATE RANGE FILTER
+    # -------------------------------------------------------
+    st.markdown("---")
     st.subheader("📅 Filter by Date Range")
+
     min_date, max_date = df["Date"].min(), df["Date"].max()
-    start_date, end_date = st.date_input("Select date range:", [min_date, max_date])
+    start_date, end_date = st.date_input(
+        "Select date range:",
+        [min_date, max_date],
+        min_value=min_date,
+        max_value=max_date
+    )
 
     filtered_df = df[
         (df["Date"] >= pd.to_datetime(start_date)) &
@@ -51,17 +69,25 @@ else:
 
     st.dataframe(filtered_df)
 
-    # --- Excel download ---
-    def convert_df_to_excel(df):
+    # -------------------------------------------------------
+    # 💾 EXCEL DOWNLOAD SECTION
+    # -------------------------------------------------------
+    st.markdown("### 💾 Download Data (Excel)")
+
+    def convert_df_to_excel(dataframe):
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='Data')
+            dataframe.to_excel(writer, index=False, sheet_name='Data')
         output.seek(0)
         return output.getvalue()
 
+    excel_data = convert_df_to_excel(df)  # Full dataset, not filtered
+
     st.download_button(
-        "⬇️ Download Full Dataset (Excel)",
-        convert_df_to_excel(df),
+        label="⬇️ Download Complete Dataset (Excel)",
+        data=excel_data,
         file_name=f"goshala_data_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+
+    st.success("✅ Dashboard loaded successfully!")
