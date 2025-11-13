@@ -599,13 +599,13 @@ else:
             c3.metric("📈 Coverage (%)", f"{coverage}%")
     
             # --- Optional: show missing / matched shelters ---
-            with st.expander("🔎 View Matching Debug Info"):
-                st.write(f"Static shelter column used: `{static_col}`")
-                st.write(f"Inspection shelter column used: `{inspect_col}`")
-                st.write(f"Direct matches: {direct_count}, Fuzzy matches: {fuzzy_count}")
-                st.write(f"Total inspected (effective): {inspected_total}")
-                if fuzzy_matched:
-                    st.dataframe(pd.DataFrame(fuzzy_matched, columns=["inspected_norm", "static_norm_match"]).head(10))
+            #with st.expander("🔎 View Matching Debug Info"):
+                #st.write(f"Static shelter column used: `{static_col}`")
+                #st.write(f"Inspection shelter column used: `{inspect_col}`")
+                #st.write(f"Direct matches: {direct_count}, Fuzzy matches: {fuzzy_count}")
+                #st.write(f"Total inspected (effective): {inspected_total}")
+                #if fuzzy_matched:
+                    #st.dataframe(pd.DataFrame(fuzzy_matched, columns=["inspected_norm", "static_norm_match"]).head(10))
     
             
     
