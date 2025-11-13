@@ -41,8 +41,6 @@ elif auth_status is None:
     st.info("🟡 Please enter your credentials to access the dashboard.")
 else:
 
-    st.success("successfully logged in ... ")
-    st.title("Loading dashboard...")
     # step1_app.py
     # Goshala Inspection Dashboard - Full version
     # Light theme, tabs (no sidebar), interactive map, PDF generator for all tabs
