@@ -38,7 +38,7 @@ else:
     st.write("You are now logged in and can view the complete dashboard.")
 
     # -------------------------------------------------------
-    # 🧾 SAMPLE DATA (replace with your actual Google Sheet)
+    # 🧾 SAMPLE DATA (replace with your actual source)
     # -------------------------------------------------------
     data = {
         "Date": pd.date_range(start="2025-01-01", periods=10, freq="D"),
@@ -81,7 +81,7 @@ else:
         output.seek(0)
         return output.getvalue()
 
-    excel_data = convert_df_to_excel(df)  # Full dataset, not filtered
+    excel_data = convert_df_to_excel(df)  # full dataset
 
     st.download_button(
         label="⬇️ Download Complete Dataset (Excel)",
