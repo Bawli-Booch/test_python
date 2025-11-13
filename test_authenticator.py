@@ -9,13 +9,20 @@ from datetime import datetime
 # -------------------------------------------------------
 auth_config = st.secrets["auth"]
 
+names = list(auth_config["names"])
+usernames = list(auth_config["usernames"])
+passwords = list(auth_config["passwords"])
+cookie_name = str(auth_config["cookie_name"])
+signature_key = str(auth_config["signature_key"])
+cookie_expiry_days = int(auth_config["cookie_expiry_days"])
+
 authenticator = stauth.Authenticate(
-    auth_config["names"],
-    auth_config["usernames"],
-    auth_config["passwords"],
-    auth_config["cookie_name"],
-    auth_config["signature_key"],
-    cookie_expiry_days=auth_config["cookie_expiry_days"]
+    names,
+    usernames,
+    passwords,
+    cookie_name,
+    signature_key,
+    cookie_expiry_days=cookie_expiry_days
 )
 
 name, auth_status, username = authenticator.login("Login", "main")
@@ -37,9 +44,7 @@ else:
     st.title("📊 Goshala Inspection Dashboard")
     st.write("You are now logged in and can view the complete dashboard.")
 
-    # -------------------------------------------------------
-    # 🧾 SAMPLE DATA (replace with your actual source)
-    # -------------------------------------------------------
+    # Example dataset
     data = {
         "Date": pd.date_range(start="2025-01-01", periods=10, freq="D"),
         "Officer": ["Officer A", "Officer B"] * 5,
@@ -48,9 +53,7 @@ else:
     }
     df = pd.DataFrame(data)
 
-    # -------------------------------------------------------
-    # 📅 DATE RANGE FILTER
-    # -------------------------------------------------------
+    # Date Range Filter
     st.markdown("---")
     st.subheader("📅 Filter by Date Range")
 
@@ -69,9 +72,7 @@ else:
 
     st.dataframe(filtered_df)
 
-    # -------------------------------------------------------
-    # 💾 EXCEL DOWNLOAD SECTION
-    # -------------------------------------------------------
+    # Excel Download
     st.markdown("### 💾 Download Data (Excel)")
 
     def convert_df_to_excel(dataframe):
@@ -81,7 +82,7 @@ else:
         output.seek(0)
         return output.getvalue()
 
-    excel_data = convert_df_to_excel(df)  # full dataset
+    excel_data = convert_df_to_excel(df)
 
     st.download_button(
         label="⬇️ Download Complete Dataset (Excel)",
