@@ -472,6 +472,7 @@ else:
     refresh_btn = col_f.button("Refresh Data")
     
     if refresh_btn:
+        st.error("rerun button error")
         #st.experimental_rerun()
     
     # Apply global date + block + type + officer filters to create df_base used across tabs
