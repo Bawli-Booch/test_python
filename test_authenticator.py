@@ -1,94 +1,126 @@
 import streamlit as st
 import streamlit_authenticator as stauth
-import pandas as pd
-import io
-from datetime import datetime
+import traceback
 
-# -------------------------------------------------------
-# 🔒 AUTHENTICATION SETUP
-# -------------------------------------------------------
-auth_config = st.secrets["auth"]
+st.title("🔍 Streamlit Authentication Debug Tool")
 
-names = list(auth_config["names"])
-usernames = list(auth_config["usernames"])
-passwords = list(auth_config["passwords"])
-cookie_name = str(auth_config["cookie_name"])
-signature_key = str(auth_config["signature_key"])
-cookie_expiry_days = int(auth_config["cookie_expiry_days"])
+# ------------------------------------------------------------
+# STEP 1️⃣  Test: Can Streamlit see secrets.toml at all?
+# ------------------------------------------------------------
+st.subheader("Step 1️⃣ – Secrets visibility check")
 
-authenticator = stauth.Authenticate(
-    names,
-    usernames,
-    passwords,
-    cookie_name,
-    signature_key,
-    cookie_expiry_days=cookie_expiry_days
-)
+try:
+    st.write("🔹 Full secrets dictionary:")
+    st.json(st.secrets)  # shows everything Streamlit can see
+except Exception as e:
+    st.error(f"❌ Could not access secrets: {e}")
+    st.stop()
 
-name, auth_status, username = authenticator.login("Login", "main")
+# ------------------------------------------------------------
+# STEP 2️⃣  Check for 'auth' key
+# ------------------------------------------------------------
+st.subheader("Step 2️⃣ – Check for [auth] section")
 
-# -------------------------------------------------------
-# 🚧 AUTHENTICATION STATES
-# -------------------------------------------------------
-if auth_status is False:
-    st.error("❌ Invalid username or password. Please try again.")
-elif auth_status is None:
-    st.warning("👋 Please enter your username and password to access the dashboard.")
+if "auth" not in st.secrets:
+    st.error("❌ No [auth] section found in secrets.toml! "
+             "Please create `.streamlit/secrets.toml` with [auth] header, "
+             "or add the same content under 'Manage App → Secrets' in Streamlit Cloud.")
+    st.stop()
 else:
-    # -------------------------------------------------------
-    # ✅ MAIN DASHBOARD CONTENT
-    # -------------------------------------------------------
-    authenticator.logout("Logout", "sidebar")
-    st.sidebar.success(f"Welcome, {name}")
+    st.success("✅ [auth] section found.")
+    auth_config = st.secrets["auth"]
+    st.json(auth_config)
 
-    st.title("📊 Goshala Inspection Dashboard")
-    st.write("You are now logged in and can view the complete dashboard.")
+# ------------------------------------------------------------
+# STEP 3️⃣  Verify required keys exist
+# ------------------------------------------------------------
+st.subheader("Step 3️⃣ – Verify all keys exist")
 
-    # Example dataset
-    data = {
-        "Date": pd.date_range(start="2025-01-01", periods=10, freq="D"),
-        "Officer": ["Officer A", "Officer B"] * 5,
-        "Inspected": [True, False] * 5,
-        "Remarks": ["Good", "Needs Improvement"] * 5
-    }
-    df = pd.DataFrame(data)
+required_keys = ["names", "usernames", "passwords", "cookie_name", "signature_key", "cookie_expiry_days"]
+missing = [k for k in required_keys if k not in auth_config]
 
-    # Date Range Filter
-    st.markdown("---")
-    st.subheader("📅 Filter by Date Range")
+if missing:
+    st.error(f"❌ Missing keys in [auth]: {missing}")
+    st.stop()
+else:
+    st.success("✅ All required keys are present.")
 
-    min_date, max_date = df["Date"].min(), df["Date"].max()
-    start_date, end_date = st.date_input(
-        "Select date range:",
-        [min_date, max_date],
-        min_value=min_date,
-        max_value=max_date
+# ------------------------------------------------------------
+# STEP 4️⃣  Safely load values with type checks
+# ------------------------------------------------------------
+st.subheader("Step 4️⃣ – Convert and verify data types")
+
+try:
+    names = list(auth_config["names"])
+    usernames = list(auth_config["usernames"])
+    passwords = list(auth_config["passwords"])
+    cookie_name = str(auth_config["cookie_name"])
+    signature_key = str(auth_config["signature_key"])
+    cookie_expiry_days = int(auth_config["cookie_expiry_days"])
+
+    st.write("✅ Data types look good:")
+    st.write(f"- names: {type(names)} ({len(names)} entries)")
+    st.write(f"- usernames: {type(usernames)} ({len(usernames)} entries)")
+    st.write(f"- passwords: {type(passwords)} ({len(passwords)} entries)")
+    st.write(f"- cookie_name: {cookie_name}")
+    st.write(f"- signature_key: {signature_key[:5]}********")
+    st.write(f"- cookie_expiry_days: {cookie_expiry_days}")
+
+except Exception as e:
+    st.error(f"❌ Error converting secrets data: {e}")
+    st.exception(e)
+    st.stop()
+
+# ------------------------------------------------------------
+# STEP 5️⃣  Test authenticator creation
+# ------------------------------------------------------------
+st.subheader("Step 5️⃣ – Initialize streamlit-authenticator")
+
+try:
+    authenticator = stauth.Authenticate(
+        names,
+        usernames,
+        passwords,
+        cookie_name,
+        signature_key,
+        cookie_expiry_days=cookie_expiry_days
     )
+    st.success("✅ Authenticator object created successfully.")
+except Exception as e:
+    st.error("❌ Error creating authenticator:")
+    st.exception(e)
+    st.stop()
 
-    filtered_df = df[
-        (df["Date"] >= pd.to_datetime(start_date)) &
-        (df["Date"] <= pd.to_datetime(end_date))
-    ]
+# ------------------------------------------------------------
+# STEP 6️⃣  Test login UI
+# ------------------------------------------------------------
+st.subheader("Step 6️⃣ – Test login UI")
 
-    st.dataframe(filtered_df)
+try:
+    name, auth_status, username = authenticator.login("Login", "main")
 
-    # Excel Download
-    st.markdown("### 💾 Download Data (Excel)")
+    if auth_status is False:
+        st.error("❌ Invalid username or password.")
+    elif auth_status is None:
+        st.info("🟡 Please enter credentials above.")
+    else:
+        authenticator.logout("Logout", "sidebar")
+        st.sidebar.success(f"Welcome, {name}")
+        st.success(f"✅ Login successful as: {name} ({username})")
 
-    def convert_df_to_excel(dataframe):
-        output = io.BytesIO()
-        with pd.ExcelWriter(output, engine='openpyxl') as writer:
-            dataframe.to_excel(writer, index=False, sheet_name='Data')
-        output.seek(0)
-        return output.getvalue()
+except Exception as e:
+    st.error("❌ Exception in login process:")
+    st.exception(e)
+    st.stop()
 
-    excel_data = convert_df_to_excel(df)
+# ------------------------------------------------------------
+# STEP 7️⃣  Final confirmation
+# ------------------------------------------------------------
+st.markdown("---")
+st.subheader("✅ Summary")
 
-    st.download_button(
-        label="⬇️ Download Complete Dataset (Excel)",
-        data=excel_data,
-        file_name=f"goshala_data_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-
-    st.success("✅ Dashboard loaded successfully!")
+st.write("""
+- If all steps above are green ✅, your secrets.toml and authenticator are configured correctly.  
+- If you get a ❌ in Step 1 or 2 → the app can't read secrets (wrong path or missing section).  
+- If Step 5 fails → check package version (`streamlit-authenticator==0.3.1`).  
+""")
