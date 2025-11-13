@@ -394,7 +394,7 @@ else:
                 )
     
         # --- Display preview ---
-        st.success("✅ Static data loaded and renamed successfully!")
+        #st.success("✅ Static data loaded and renamed successfully!")
         # st.dataframe(static_df.head(10))
     else:
         st.warning("⚠️ No local static file found or it’s empty.")
