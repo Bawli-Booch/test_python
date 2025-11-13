@@ -472,7 +472,7 @@ else:
     refresh_btn = col_f.button("Refresh Data")
     
     if refresh_btn:
-        st.experimental_rerun()
+        #st.experimental_rerun()
     
     # Apply global date + block + type + officer filters to create df_base used across tabs
     if not df_inspect.empty:
