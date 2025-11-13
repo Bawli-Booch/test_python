@@ -40,13 +40,7 @@ if auth_status is False:
 elif auth_status is None:
     st.info("🟡 Please enter your credentials to access the dashboard.")
 else:
-    # --- Top right logout button ---
-    col1, col2 = st.columns([8, 2])
-    with col2:
-        authenticator.logout("🔓 Logout", "main")
-    with col1:
-        st.success(f"Welcome, {name}")
-
+    
     # step1_app.py
     # Goshala Inspection Dashboard - Full version
     # Light theme, tabs (no sidebar), interactive map, PDF generator for all tabs
@@ -1242,7 +1236,14 @@ else:
         file_name=f"goshala_data_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-    
+
+    # --- Top right logout button ---
+    col1, col2 = st.columns([8, 2])
+    with col2:
+        authenticator.logout("🔓 Logout", "main")
+    with col1:
+        st.success(f"Welcome, {name}")
+
     # -------------------------------
     # End of app
     # -------------------------------
