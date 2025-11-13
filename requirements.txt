@@ -1,4 +1,14 @@
 streamlit
 pandas
-openpyxl
 streamlit-authenticator==0.3.1
+numpy
+plotly
+pydeck
+gspread
+oauth2client
+requests
+openpyxl
+python-dotenv
+folium
+streamlit-folium
+fpdf2
