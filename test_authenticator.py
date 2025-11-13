@@ -41,6 +41,10 @@ if auth_status is False:
 elif auth_status is None:
     st.info("🟡 Please enter your credentials to access the dashboard.")
 else:
-    authenticator.logout("Logout", "sidebar")
-    st.sidebar.success(f"Welcome, {name}")
-    st.success(f"✅ Logged in as {username}")
+    # --- Top right logout button ---
+    col1, col2 = st.columns([9, 1])
+    with col2:
+        authenticator.logout("🔓 Logout", "main")
+    with col1:
+        st.success(f"Welcome, {name}")
+    
